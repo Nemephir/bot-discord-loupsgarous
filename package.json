@@ -1,0 +1,28 @@
+{
+  "name": "bot-discord-loupsgarous",
+  "version": "1.0.0",
+  "description": "",
+  "main": "loupsgarous.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon loupsgarous.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nemephir/bot-discord-loupsgarous.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nemephir/bot-discord-loupsgarous/issues"
+  },
+  "homepage": "https://github.com/Nemephir/bot-discord-loupsgarous#readme",
+  "dependencies": {
+    "nodemon": "^2.0.12",
+    "discord.js": "^13.1.0",
+    "sails": "^1.4.4",
+    "sails-mongo": "^2.0.0",
+    "colors": "^1.4.0",
+    "dotenv": "^10.0.0"
+  }
+}
