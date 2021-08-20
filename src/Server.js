@@ -1,6 +1,6 @@
-const Channel     = require( './Channel' )
-const HallChannel = require( './Channel/HallChannel' )
-const Game        = require( './Game' )
+const Channel       = require( './Channel' )
+const HallChannel   = require( './Channel/HallChannel' )
+const Game          = require( './Game' )
 
 class Server {
 
@@ -8,6 +8,7 @@ class Server {
 	data
 	channels = {}
 	hall
+	buttonsInstance
 
 	constructor( guild ) {
 		this.guild = guild
@@ -18,6 +19,17 @@ class Server {
 		this.data = await this.loadData()
 		await this.clean()
 		await this.getChannels()
+
+		this.guild.client.on('interactionCreate', interaction => {
+			if( interaction.isButton() ) {
+				let action = interaction.customId.split(':');
+				console.table( action )
+				interaction.reply({
+					content:'ok merci',
+					ephemeral: true
+				})
+			}
+		});
 	}
 
 	async clean() {

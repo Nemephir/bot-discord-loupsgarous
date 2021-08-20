@@ -1,4 +1,5 @@
 const { TextChannel } = require( 'discord.js' )
+const { MessageActionRow, MessageButton, MessageEmbed } = require( 'discord.js' )
 
 class Channel {
 
@@ -32,7 +33,8 @@ class Channel {
 	}
 
 	async send( msg ) {
-		return await this.channel.send(msg)
+
+		return await this.channel.send( msg )
 	}
 
 }
