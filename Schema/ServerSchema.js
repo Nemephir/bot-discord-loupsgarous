@@ -7,6 +7,8 @@ const Server = new Schema( {
 	name             : String,
 	enabled          : Boolean,
 	defaultGamesRoles: Array,
+	prefix           : String,
+	category         : String,
 	hallChannel      : String
 } )
 

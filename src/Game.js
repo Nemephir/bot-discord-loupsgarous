@@ -10,7 +10,6 @@ class Game {
 
 	constructor( originalMessage, server ) {
 		this.id     = originalMessage.id
-		this.name   = 'game-' + this.id
 		this.owner  = originalMessage.author
 		this.server = server
 		this.init()
@@ -24,17 +23,17 @@ class Game {
 	}
 
 	async createRole() {
-		this.role = await this.server.createRole( this.name )
+		this.role = await this.server.createRole( this.id )
 	}
 
 	async createTextChannel() {
-		await this.server.createChannel( this.name, 'GUILD_TEXT', {
+		await this.server.createChannel( this.id, 'GUILD_TEXT', {
 			permissionOverwrites: await this.getChannelPermissions()
 		} )
 	}
 
 	async createVoiceChannel() {
-		await this.server.createChannel( this.name, 'GUILD_VOICE', {
+		await this.server.createChannel( this.id, 'GUILD_VOICE', {
 			permissionOverwrites: await this.getChannelPermissions()
 		} )
 	}
