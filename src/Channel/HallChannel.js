@@ -12,7 +12,7 @@ class HallChannel extends Channel {
 	}
 
 	async generateMainMessageContent() {
-		let rst = lang.fr.hall_main_message
+		let rst = lang.get('hall_main_message')
 		// rst += '\n\n' + lang.fr.waiting_games
 		// rst += '\n\n' + lang.fr.running_games
 
@@ -36,7 +36,7 @@ class HallChannel extends Channel {
 			.setContent( rst )
 			.addButton(
 				new Button()
-					.setText( lang.fr.game.create )
+					.setText( lang.get('game.create') )
 					.setData( 'game:create' )
 					.setCallable( async ( interaction, params ) => {
 						let game = await this.server.createGame( interaction.user.id )

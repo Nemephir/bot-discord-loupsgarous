@@ -9,8 +9,11 @@ class Game {
 	name
 	owner
 	server
+	textChannel
+	voiceChannel
 	role
 	message
+	players = {}
 
 	constructor( ownerId, server ) {
 		this.id     = uniquid()
@@ -32,13 +35,13 @@ class Game {
 	}
 
 	async createTextChannel() {
-		await this.server.createChannel( this.id, 'GUILD_TEXT', {
+		this.textChannel = await this.server.createChannel( this.id, 'GUILD_TEXT', {
 			permissionOverwrites: await this.getChannelPermissions()
 		} )
 	}
 
 	async createVoiceChannel() {
-		await this.server.createChannel( this.id, 'GUILD_VOICE', {
+		this.voiceChannel = await this.server.createChannel( this.id, 'GUILD_VOICE', {
 			permissionOverwrites: await this.getChannelPermissions()
 		} )
 	}
@@ -47,9 +50,19 @@ class Game {
 		return await this.server.guild.members.fetch( userId !== undefined ? userId : this.owner )
 	}
 
-	async assignRole( userId ) {
+	async assignRole( userId , isOwner = false ) {
 		let user = await this.getUser( userId )
 		await user.roles.add( this.role.id )
+
+		let message = await new Message()
+			.setContent( lang.get('game.join', {userId:user.id}) )
+			.send( this.textChannel )
+
+		this.players[user.id] = {
+			user     : user,
+			owner    : isOwner,
+			joinedMsg: message
+		}
 	}
 
 	async playerInGame( userId ) {

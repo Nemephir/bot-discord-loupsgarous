@@ -2,7 +2,13 @@ module.exports = {
 	hall_main_message: 'Bonjour,\n!create',
 
 	game: {
-		create: "Créer une partie"
+		create: "Créer une partie",
+		join: [
+			'<@{userId}> a rejoint la partie',
+			'Faites place à <@{userId}>',
+			'<@{userId}> fait parti du village',
+			'<@{userId}> a rejoint la chasse aux loups garous',
+		]
 	},
 
 	discord_character_full: '**{icon} {prefix} {character}**',
