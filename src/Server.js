@@ -1,6 +1,6 @@
-const Channel       = require( './Channel' )
-const HallChannel   = require( './Channel/HallChannel' )
-const Game          = require( './Game' )
+const Channel     = require( './Channel' )
+const HallChannel = require( './Channel/HallChannel' )
+const Game        = require( './Game' )
 
 class Server {
 
@@ -20,20 +20,17 @@ class Server {
 		await this.clean()
 		await this.getChannels()
 
-		this.guild.client.on('interactionCreate', interaction => {
+		this.guild.client.on( 'interactionCreate', interaction => {
 			if( interaction.isButton() ) {
-				let action = interaction.customId.split(':');
-				console.table( action )
-				interaction.reply({
-					content:'ok merci',
-					ephemeral: true
-				})
+				let split    = interaction.customId.split( ':' )
+				let buttonId = split.shift()
+				discord.buttonManager.get( buttonId ).call( interaction, split )
 			}
-		});
+		} )
 	}
 
 	async clean() {
-		let prefix = this.data.prefix;
+		let prefix   = this.data.prefix
 		// Delete channels
 		let channels = await this.guild.channels.fetch()
 		channels.each( async channel => {
@@ -81,12 +78,12 @@ class Server {
 		} )
 
 		if( this.hall !== undefined ) {
-			this.hall.manageMainMessage()
+			this.hall.manageMessages()
 		}
 	}
 
-	async createGame( message ) {
-		new Game( message, this )
+	async createGame( ownerId ) {
+		return new Game( ownerId, this )
 	}
 
 	async createChannel( identifier, type, options = {} ) {

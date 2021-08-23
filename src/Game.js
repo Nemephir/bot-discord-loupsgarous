@@ -1,4 +1,7 @@
 const { Permissions, GuildMemberRoleManager, UserManager } = require( 'discord.js' )
+const uniquid                                              = require( 'uniquid' )
+const Message                                              = require( './Discord/Message' )
+const Button                                               = require( './Discord/Button' )
 
 class Game {
 
@@ -7,10 +10,11 @@ class Game {
 	owner
 	server
 	role
+	message
 
-	constructor( originalMessage, server ) {
-		this.id     = originalMessage.id
-		this.owner  = originalMessage.author
+	constructor( ownerId, server ) {
+		this.id     = uniquid()
+		this.owner  = ownerId
 		this.server = server
 		this.init()
 	}
@@ -20,6 +24,7 @@ class Game {
 		await this.createTextChannel()
 		await this.createVoiceChannel()
 		await this.assignRole( this.owner )
+		await this.sendMessage()
 	}
 
 	async createRole() {
@@ -38,9 +43,45 @@ class Game {
 		} )
 	}
 
-	async assignRole() {
-		let user = await this.server.guild.members.fetch( this.owner.id );
+	async getUser( userId ) {
+		return await this.server.guild.members.fetch( userId !== undefined ? userId : this.owner )
+	}
+
+	async assignRole( userId ) {
+		let user = await this.getUser( userId )
 		await user.roles.add( this.role.id )
+	}
+
+	async playerInGame( userId ) {
+		return new Promise( async resolve => {
+			let user = await this.getUser( userId )
+			user.roles.cache.each( v => {
+				if( v.name.indexOf( this.server.data.prefix ) === 0 )
+					resolve(true)
+			})
+
+			resolve( false )
+		})
+	}
+
+	async sendMessage() {
+		this.message = await new Message()
+			.setContent( 'Nouvelle partie' )
+			.addButton( new Button()
+				.setText( 'Rejoindre' )
+				.setCallable( async ( interaction, params ) => {
+					await interaction.defer()
+					if( await this.playerInGame( interaction.user.id ) ) {
+						await interaction.edit( 'Vous êtes déjà en jeu' )
+					}
+					else {
+						await this.assignRole( interaction.user.id )
+						await interaction.edit( 'Vous avez rejoins la partie' )
+					}
+				} )
+				.getButton()
+			)
+			.send( this.server.hall.channel )
 	}
 
 	async getChannelPermissions() {
@@ -59,10 +100,10 @@ class Game {
 
 		// Ajout des rôles staff
 		for( let role of this.server.data.defaultGamesRoles ) {
-			permissions.push({
+			permissions.push( {
 				id   : role.id,
 				allow: [ 'VIEW_CHANNEL' ]
-			})
+			} )
 		}
 
 		return permissions

@@ -1,4 +1,5 @@
 const Server              = require( './Server' )
+const ButtonManager       = require( './Discord/ButtonManager' )
 const { Client, Intents } = require( 'discord.js' )
 const client              = new Client( { intents: [ Intents.FLAGS.GUILDS ] } )
 
@@ -6,8 +7,10 @@ class Discord {
 
 	client  = client
 	servers = {}
+	buttonManager
 
 	constructor() {
+		this.buttonManager = new ButtonManager()
 		this.defineConstants()
 		this.init()
 	}
@@ -20,16 +23,16 @@ class Discord {
 			await this.getServers()
 		} )
 
-		client.on('message', msg => {
-			console.log(msg)
-		})
+		client.on( 'message', msg => {
+			console.log( msg )
+		} )
 
 		client.login( process.env.DISCORD_APP_TOKEN )
 	}
 
 	async getServersWhitelist() {
-		return ( await Model.Server.find({enabled:true}) )
-			.map( v => v.id );
+		return ( await Model.Server.find( { enabled: true } ) )
+			.map( v => v.id )
 	}
 
 	async getServers() {
@@ -38,14 +41,14 @@ class Discord {
 		let pendingGuilds = []
 
 		guilds.each( guild => {
-			if( whitelist.indexOf(guild.id) > -1 ) {
+			if( whitelist.indexOf( guild.id ) > -1 ) {
 				pendingGuilds.push( guild.fetch() )
 			}
 		} )
 
 		await Promise.all( pendingGuilds ).then( guilds => {
 			for( let guild of guilds ) {
-				this.servers[guild.id] = new Server(guild)
+				this.servers[guild.id] = new Server( guild )
 			}
 		} )
 	}

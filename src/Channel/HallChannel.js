@@ -1,5 +1,7 @@
 const { MessageActionRow, MessageButton, MessageEmbed } = require( 'discord.js' )
 const Channel                                           = require( './../Channel' )
+const Message                                           = require( './../Discord/Message' )
+const Button                                            = require( './../Discord/Button' )
 
 class HallChannel extends Channel {
 
@@ -7,25 +9,6 @@ class HallChannel extends Channel {
 
 	async init() {
 		super.init()
-
-		await this.manageNewMessages()
-	}
-
-	async manageNewMessages() {
-		setTimeout( async () => {
-			let messages = await this.channel.messages.fetch()
-			await messages.each( async message => {
-				if( ! this.isMainMessage( message ) ) {
-					if( message.content.startsWith( '!create' ) ) {
-						await this.server.createGame( message )
-					}
-
-					await message.delete()
-				}
-			} )
-
-			this.manageNewMessages()
-		}, 5000 )
 	}
 
 	async generateMainMessageContent() {
@@ -34,84 +17,40 @@ class HallChannel extends Channel {
 		// rst += '\n\n' + lang.fr.running_games
 
 		let exampleEmbed = {
-			color: 0x0099ff,
-			title: 'Some title',
-			url: 'https://discord.js.org',
-			author: {
-				name: 'Some name',
+			color      : 0x0099ff,
+			title      : 'Some title',
+			url        : 'https://discord.js.org',
+			author     : {
+				name    : 'Some name',
 				icon_url: 'https://i.imgur.com/AfFp7pu.png',
-				url: 'https://discord.js.org',
+				url     : 'https://discord.js.org'
 			},
 			description: 'Some description here',
-			thumbnail: {
-				url: 'https://i.imgur.com/AfFp7pu.png',
+			thumbnail  : {
+				url: 'https://i.imgur.com/AfFp7pu.png'
 			}
-		};
-
-		let button = new MessageButton()
-			.setLabel('My First Button!') //default: NO_LABEL_PROVIDED
+		}
 
 		// https://discord.com/developers/docs/interactions/message-components#action-rows
-		return {
-			content: rst ,
-			embeds: [exampleEmbed] ,
-			"components": [
-				{
-					"type": 1,
-					"components": [
-						{
-							"type": 2,
-							"label": "Rejoindre",
-							"style": 1,
-							"custom_id": "join:xxxxxxx"
-						},
-						{
-							"type": 2,
-							"label": "Regarder",
-							"style": 2,
-							"custom_id": "view:xxxxxxx"
-						},
-					]
-
-				}
-			]
-		}
+		return new Message()
+			.setContent( rst )
+			.addButton(
+				new Button()
+					.setText( lang.fr.game.create )
+					.setData( 'game:create' )
+					.setCallable( async ( interaction, params ) => {
+						let game = await this.server.createGame( interaction.user.id )
+						interaction.replyPrivate(`Partie créée : ${this.server.getGameName(game.id)}`)
+					} )
+					.getButton()
+			)
 	}
 
-	async updateMainMessage() {
-		if( this.mainMessage !== undefined ) {
-			let content = await this.generateMainMessageContent()
-			if( this.mainMessage.content !== content ) {
-				await this.mainMessage.edit( content )
-			}
-		}
-	}
-
-	async manageMainMessage() {
-		this.mainMessage = await this.findMainMessage()
-
-		if( ! this.mainMessage ) {
-			this.mainMessage = await this.send( await this.generateMainMessageContent() )
-			await this.mainMessage.pin()
-		}
-		else {
-			this.updateMainMessage()
-		}
-
+	async manageMessages() {
+		let message = await this.generateMainMessageContent();
+		this.mainMessage = await message.send( this.channel );
+		await this.mainMessage.message.pin()
 		await this.removeTooManyMessages()
-	}
-
-	async findMainMessage() {
-		return new Promise( async resolve => {
-			let messages = await this.channel.messages.fetch()
-			messages.each( ( message ) => {
-				if( this.isMainMessage( message ) ) {
-					resolve( message )
-				}
-			} )
-
-			resolve( false )
-		} )
 	}
 
 	async removeTooManyMessages() {
@@ -124,8 +63,7 @@ class HallChannel extends Channel {
 	}
 
 	isMainMessage( message ) {
-		return message.pinned
-			&& discord.isMe( message.author.id )
+		return message.id === this.mainMessage.id
 	}
 
 }
