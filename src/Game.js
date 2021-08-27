@@ -300,6 +300,7 @@ class Game {
 			.setText( lang.get( 'game.start' ) )
 			.setCallable( async ( interaction, params ) => {
 				await interaction.defer()
+				// TODO : la suite ici ...
 			} )
 			.getButton()
 	}
