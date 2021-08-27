@@ -12,43 +12,25 @@ class HallChannel extends Channel {
 	}
 
 	async generateMainMessageContent() {
-		let rst = lang.get('hall_main_message')
-		// rst += '\n\n' + lang.fr.waiting_games
-		// rst += '\n\n' + lang.fr.running_games
-
-		let exampleEmbed = {
-			color      : 0x0099ff,
-			title      : 'Some title',
-			url        : 'https://discord.js.org',
-			author     : {
-				name    : 'Some name',
-				icon_url: 'https://i.imgur.com/AfFp7pu.png',
-				url     : 'https://discord.js.org'
-			},
-			description: 'Some description here',
-			thumbnail  : {
-				url: 'https://i.imgur.com/AfFp7pu.png'
-			}
-		}
+		let rst = lang.get( 'hall_main_message' )
 
 		// https://discord.com/developers/docs/interactions/message-components#action-rows
 		return new Message()
 			.setContent( rst )
 			.addButton(
 				new Button()
-					.setText( lang.get('game.create') )
-					.setData( 'game:create' )
+					.setText( lang.get( 'game.create' ) )
 					.setCallable( async ( interaction, params ) => {
 						let game = await this.server.createGame( interaction.user.id )
-						interaction.replyPrivate(`Partie créée : ${this.server.getGameName(game.id)}`)
+						interaction.replyPrivate( `Partie créée : ${this.server.getGameName( game.id )}` )
 					} )
 					.getButton()
 			)
 	}
 
 	async manageMessages() {
-		let message = await this.generateMainMessageContent();
-		this.mainMessage = await message.send( this.channel );
+		let message      = await this.generateMainMessageContent()
+		this.mainMessage = await message.send( this.channel )
 		await this.mainMessage.message.pin()
 		await this.removeTooManyMessages()
 	}

@@ -6,6 +6,12 @@ class Lang {
 		this.translations = require('./lang/fr')
 	}
 
+	/**
+	 * Récupère et complète et une clé de traduction
+	 * @param key
+	 * @param params
+	 * @returns {string|*}
+	 */
 	get( key , params = {} ) {
 		let rst = eval( 'this.translations.' + key );
 		if( rst ) {
@@ -20,6 +26,12 @@ class Lang {
 		}
 	}
 
+	/**
+	 * Remplace les variables dans la chaîne de traduction
+	 * @param str
+	 * @param params
+	 * @returns {*}
+	 */
 	parse( str , params ) {
 		for( let [key,content] of Object.entries(params) ) {
 			key = `{${key}}`

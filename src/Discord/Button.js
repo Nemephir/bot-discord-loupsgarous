@@ -63,7 +63,21 @@ class Button {
 		interaction.replyPrivate = async function( msg ) {
 			await this.reply( {
 				content  : msg,
-				ephemeral: true
+				ephemeral: true,
+				// "components": [
+				// 	{
+				// 		"type": 1,
+				// 		"components": [
+				// 			{
+				// 				"type": 2,
+				// 				"label": "Click me!",
+				// 				"style": 1,
+				// 				"custom_id": "click_one"
+				// 			}
+				// 		]
+				//
+				// 	}
+				// ]
 			} )
 		}
 		interaction.defer = async function( msg ) {

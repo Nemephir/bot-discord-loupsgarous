@@ -7,11 +7,11 @@ class Server {
 	guild
 	data
 	channels = {}
+	games = {}
 	hall
-	buttonsInstance
 
 	constructor( guild ) {
-		this.guild = guild
+		this.guild   = guild
 		this.init()
 	}
 
@@ -29,6 +29,10 @@ class Server {
 		} )
 	}
 
+	/**
+	 * Supprime les canaux et les rôles superflux
+	 * @returns {Promise<void>}
+	 */
 	async clean() {
 		let prefix   = this.data.prefix
 		// Delete channels
@@ -83,7 +87,9 @@ class Server {
 	}
 
 	async createGame( ownerId ) {
-		return new Game( ownerId, this )
+		let game = new Game( ownerId, this )
+		this.games[game.id] = game
+		return this.games[game.id]
 	}
 
 	async createChannel( identifier, type, options = {} ) {
